@@ -5,10 +5,10 @@ class Singleton(type):
 
     _instances = {}
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__(self, *args, **kwargs):
+        if self not in self._instances:
+            self._instances[self] = super(Singleton, self).__call__(*args, **kwargs)
+        return self._instances[self]
 
 
 class Visitor(object):
@@ -21,7 +21,7 @@ class Visitor(object):
     """
 
     def visit(self, subject):
-        method_name = 'visit_' + type(subject).__name__
+        method_name = f'visit_{type(subject).__name__}'
         method = getattr(self, method_name)
         if method is None:
             method = self.generic_visit

@@ -42,11 +42,10 @@ def test(labels_relation, labels_entity, out_confidence_relation_val, out_confid
     entities_pred = np.argmax(out_confidence_entity_val, axis=1)
 
     # noinspection PyDictCreation
-    results = {}
-    # number of objects
-    results["entity_total"] = entity_gt.shape[0]
-    # number of predicates / relationships
-    results["relations_total"] = relation_gt.shape[0] * relation_gt.shape[1]
+    results = {
+        "entity_total": entity_gt.shape[0],
+        "relations_total": relation_gt.shape[0] * relation_gt.shape[1],
+    }
     # number of positive predicates / relationships
     pos_indices = np.where(relation_gt != NOF_PREDICATES - 1)
     results["relations_pos_total"] = pos_indices[0].shape[0]

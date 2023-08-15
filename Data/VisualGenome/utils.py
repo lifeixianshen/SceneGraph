@@ -9,8 +9,7 @@ def GetDataDir():
     Get the local directory where the Visual Genome data is locally stored.
     """
     from os.path import dirname, realpath, join
-    dataDir = join(dirname(realpath('__file__')), 'data')
-    return dataDir
+    return join(dirname(realpath('__file__')), 'data')
 
 
 def RetrieveData(request):
@@ -21,8 +20,7 @@ def RetrieveData(request):
     connection.request("GET", request)
     response = connection.getresponse()
     jsonString = response.read()
-    data = json.loads(jsonString)
-    return data
+    return json.loads(jsonString)
 
 
 def ParseSynset(canon):
@@ -41,8 +39,6 @@ def ParseGraph(data, image):
 
     objects = []
     object_map = {}
-    relationships = []
-    attributes = []
     # Create the Objects
     for obj in data['bounding_boxes']:
         names = []
@@ -53,15 +49,25 @@ def ParseGraph(data, image):
             object_ = Object(obj['id'], obj['x'], obj['y'], obj['width'], obj['height'], names, synsets)
             object_map[obj['id']] = object_
         objects.append(object_)
-    # Create the Relationships
-    for rel in data['relationships']:
-        relationships.append(Relationship(rel['id'], object_map[rel['subject']], \
-                                          rel['predicate'], object_map[rel['object']],
-                                          ParseSynset(rel['relationship_canon'])))
-    # Create the Attributes
-    for atr in data['attributes']:
-        attributes.append(Attribute(atr['id'], object_map[atr['subject']], \
-                                    atr['attribute'], ParseSynset(atr['attribute_canon'])))
+    relationships = [
+        Relationship(
+            rel['id'],
+            object_map[rel['subject']],
+            rel['predicate'],
+            object_map[rel['object']],
+            ParseSynset(rel['relationship_canon']),
+        )
+        for rel in data['relationships']
+    ]
+    attributes = [
+        Attribute(
+            atr['id'],
+            object_map[atr['subject']],
+            atr['attribute'],
+            ParseSynset(atr['attribute_canon']),
+        )
+        for atr in data['attributes']
+    ]
     return Graph(image, objects, relationships, attributes)
 
 
@@ -76,8 +82,7 @@ def ParseImageData(data):
     height = data['height']
     coco_id = data['coco_id']
     flickr_id = data['flickr_id']
-    image = Image(img_id, url, width, height, coco_id, flickr_id)
-    return image
+    return Image(img_id, url, width, height, coco_id, flickr_id)
 
 
 def ParseRegionDescriptions(data, image):
@@ -85,14 +90,19 @@ def ParseRegionDescriptions(data, image):
     Helper to parse region descriptions.
     """
 
-    regions = []
-    if data[0].has_key('region_id'):
-        region_id_key = 'region_id'
-    else:
-        region_id_key = 'id'
-    for d in data:
-        regions.append(Region(d[region_id_key], image, d['phrase'], d['x'], d['y'], d['width'], d['height']))
-    return regions
+    region_id_key = 'region_id' if data[0].has_key('region_id') else 'id'
+    return [
+        Region(
+            d[region_id_key],
+            image,
+            d['phrase'],
+            d['x'],
+            d['y'],
+            d['width'],
+            d['height'],
+        )
+        for d in data
+    ]
 
 
 def ParseQA(data, image_map):

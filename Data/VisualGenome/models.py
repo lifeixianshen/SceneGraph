@@ -117,7 +117,7 @@ class Object:
 
     def __str__(self):
         name = self.names[0] if len(self.names) != 0 else 'None'
-        return '%s' % (name)
+        return f'{name}'
 
     def __repr__(self):
         return str(self)
@@ -226,7 +226,7 @@ class Synset:
         self.definition = definition
 
     def __str__(self):
-        return '{} - {}'.format(self.name, self.definition)
+        return f'{self.name} - {self.definition}'
 
     def __repr__(self):
         return str(self)
@@ -258,7 +258,7 @@ class ObjectMapping(object):
 
     def __str__(self):
         name = self.names[0] if len(self.names) != 0 else 'None'
-        return '%s' % (name)
+        return f'{name}'
 
     def __repr__(self):
         return str(self)

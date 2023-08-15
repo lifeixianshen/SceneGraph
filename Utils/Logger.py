@@ -20,11 +20,7 @@ class Logger(object):
         :param path: path to log file
         """
         self.name = name
-        if self.name != "":
-            self.prefix = self.name + ": "
-        else:
-            self.prefix = ""
-
+        self.prefix = f"{self.name}: " if self.name != "" else ""
         self.path = path
 
         # create dir
@@ -33,7 +29,7 @@ class Logger(object):
                 os.makedirs(self.path)
 
             # create file to log
-            self.log_file = open(self.path + "/logger.log", "w")
+            self.log_file = open(f"{self.path}/logger.log", "w")
         else:
             self.log_file = None
 
@@ -46,8 +42,8 @@ class Logger(object):
             self.path = filesmanager.get_file_path("logs")
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
-            self.log_file = open(self.path + "/logger-%s.log" % time.strftime("%c"), "w")
-            self.log("Start %s" % time.strftime("%c"))
+            self.log_file = open(f'{self.path}/logger-{time.strftime("%c")}.log', "w")
+            self.log(f'Start {time.strftime("%c")}')
 
     def log(self, str):
         """
@@ -55,7 +51,7 @@ class Logger(object):
         :param str: a string to be written
         """
         if self.log_file is not None:
-            self.log_file.write(self.name + ": " + str + "\n")
+            self.log_file.write(f"{self.name}: {str}" + "\n")
             self.log_file.flush()
         print(self.prefix + str)
 

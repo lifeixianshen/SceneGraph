@@ -13,41 +13,10 @@ if __name__ == "__main__":
     # create logger
     logger = Logger()
 
-    application = None
-    name = None
-    gpu = None
-
-    ## get input parameters
-    # application
-    if len(sys.argv) > 1:
-        application = sys.argv[1]
-
-    # module name
-    if len(sys.argv) > 2:
-        name = sys.argv[2]
-
-    # gpu number
-    if len(sys.argv) > 3:
-        gpu = sys.argv[3]
-
-    if application == "train":
-        # check if requried data version downloaded
-        if not os.path.isfile(version_filename_flag):
-            print("Error: Data wasn't downloaded. Type python Run.py for instructions how to download\n\n")
-            exit()
-        logger.log("Command: Train(module_name=%s, gpu=%s" % (name, str(gpu)))
-        train(name=name, gpu=gpu)
-
-    elif application == "eval":
-        # check if requried data version downloaded
-        if not os.path.isfile(version_filename_flag):
-            print("Error: Data wasn't downloaded. Type python Run.py for instructions how to download\n\n")
-            exit()    
-
-        logger.log("Command: Eval(module_name=%s, gpu=%s" % (name, str(gpu)))
-        eval(load_module_name=name, gpu=gpu)
-
-    elif application == "download":
+    application = sys.argv[1] if len(sys.argv) > 1 else None
+    name = sys.argv[2] if len(sys.argv) > 2 else None
+    gpu = sys.argv[3] if len(sys.argv) > 3 else None
+    if application == "download":
         logger.log("Command: Download()")
 
         filesmanager = FilesManager()
@@ -67,6 +36,23 @@ if __name__ == "__main__":
 
         # mark data version downloaded
         open(version_filename_flag, "wb").close()
+
+    elif application == "eval":
+        # check if requried data version downloaded
+        if not os.path.isfile(version_filename_flag):
+            print("Error: Data wasn't downloaded. Type python Run.py for instructions how to download\n\n")
+            exit()    
+
+        logger.log(f"Command: Eval(module_name={name}, gpu={str(gpu)}")
+        eval(load_module_name=name, gpu=gpu)
+
+    elif application == "train":
+        # check if requried data version downloaded
+        if not os.path.isfile(version_filename_flag):
+            print("Error: Data wasn't downloaded. Type python Run.py for instructions how to download\n\n")
+            exit()
+        logger.log(f"Command: Train(module_name={name}, gpu={str(gpu)}")
+        train(name=name, gpu=gpu)
 
     else:
         # print usage

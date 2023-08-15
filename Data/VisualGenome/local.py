@@ -27,14 +27,12 @@ def GetAllRegionDescriptions(dataDir=None):
         dataDir = utils.GetDataDir()
     dataFile = os.path.join(dataDir, 'region_descriptions.json')
     imageData = GetAllImageData(dataDir)
-    imageMap = {}
-    for d in imageData:
-        imageMap[d.id] = d
+    imageMap = {d.id: d for d in imageData}
     images = json.load(open(dataFile))
-    output = []
-    for image in images:
-        output.append(utils.ParseRegionDescriptions(image['regions'], imageMap[image['id']]))
-    return output
+    return [
+        utils.ParseRegionDescriptions(image['regions'], imageMap[image['id']])
+        for image in images
+    ]
 
 
 def GetAllQAs(dataDir=None):
@@ -45,14 +43,9 @@ def GetAllQAs(dataDir=None):
         dataDir = utils.GetDataDir()
     dataFile = os.path.join(dataDir, 'question_answers.json')
     imageData = GetAllImageData(dataDir)
-    imageMap = {}
-    for d in imageData:
-        imageMap[d.id] = d
+    imageMap = {d.id: d for d in imageData}
     images = json.load(open(dataFile))
-    output = []
-    for image in images:
-        output.append(utils.ParseQA(image['qas'], imageMap))
-    return output
+    return [utils.ParseQA(image['qas'], imageMap) for image in images]
 
 
 # --------------------------------------------------------------------------------------------------
@@ -67,7 +60,7 @@ def GetSceneGraph(image_id, images='data/', imageDataDir='data/by-id/', synsetFi
         # Instead of a string, we can pass this dict as the argument `images`
         images = {img.id: img for img in GetAllImageData(images)}
 
-    fname = str(image_id) + '.json'
+    fname = f'{str(image_id)}.json'
     image = images[image_id]
     data = json.load(open(imageDataDir + fname, 'r'))
 
@@ -96,7 +89,9 @@ def GetSceneGraphs(startIndex=0, endIndex=-1,
 
     for fname in img_fnames[startIndex: endIndex]:
         image_id = int(fname.split('.')[0])
-        scene_graph = GetSceneGraph(image_id, images, imageDataDir, dataDir + 'synsets.json')
+        scene_graph = GetSceneGraph(
+            image_id, images, imageDataDir, f'{dataDir}synsets.json'
+        )
         n_rels = len(scene_graph.relationships)
         if minRels <= n_rels <= maxRels:
             scene_graphs.append(scene_graph)
@@ -274,8 +269,7 @@ def GetSceneGraphsVRD(json_file='data/vrd/json/test.json'):
     with open(json_file, 'r') as f:
         D = json.load(f)
 
-    scene_graphs = [ParseGraphVRD(d) for d in D]
-    return scene_graphs
+    return [ParseGraphVRD(d) for d in D]
 
 
 def ParseGraphVRD(d):
@@ -292,9 +286,10 @@ def ParseGraphVRD(d):
         id2obj[i] = obj
         objs.append(obj)
 
-        for j, a in enumerate(o['attributes']):
-            atrs.append(Attribute(j, obj, a['attribute'], []))
-
+        atrs.extend(
+            Attribute(j, obj, a['attribute'], [])
+            for j, a in enumerate(o['attributes'])
+        )
     for i, r in enumerate(d['relationships']):
         s = id2obj[r['objects'][0]]
         o = id2obj[r['objects'][1]]

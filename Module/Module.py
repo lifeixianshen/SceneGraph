@@ -84,9 +84,9 @@ class Module(object):
         confidence_entity = self.confidence_entity_ph
 
         # features msg
-        for step in range(self.rnn_steps):
+        for _ in range(self.rnn_steps):
             confidence_relation, confidence_entity_temp = \
-                self.sgp(in_confidence_relation=confidence_relation,
+                    self.sgp(in_confidence_relation=confidence_relation,
                          in_confidence_entity=confidence_entity,
                          scope_name="deep_graph")
             # store the confidence
@@ -96,7 +96,7 @@ class Module(object):
                 # store the confidence
                 self.out_confidence_entity_lst.append(confidence_entity_temp)
             self.reuse = True
-        
+
         #confidence_entity = confidence_entity_temp
         self.out_confidence_relation = confidence_relation
         self.out_confidence_entity = confidence_entity
@@ -215,7 +215,7 @@ class Module(object):
             # apply phi
             self.object_ngbrs_phi = self.nn(features=self.object_ngbrs, layers=[], out=500, scope_name="nn_phi")
             # Attention mechanism
-            if self.gpi_type == "FeatureAttention" or self.gpi_type == "Linguistic":
+            if self.gpi_type in ["FeatureAttention", "Linguistic"]:
                 self.object_ngbrs_scores = self.nn(features=self.object_ngbrs, layers=[], out=500,
                                                    scope_name="nn_phi_atten")
                 self.object_ngbrs_weights = tf.nn.softmax(self.object_ngbrs_scores, dim=1)
@@ -237,7 +237,7 @@ class Module(object):
             # apply alpha
             self.object_ngbrs2_alpha = self.nn(features=self.object_ngbrs2, layers=[], out=500, scope_name="nn_phi2")
             # Attention mechanism
-            if self.gpi_type == "FeatureAttention" or self.gpi_type == "Linguistic":
+            if self.gpi_type in ["FeatureAttention", "Linguistic"]:
                 self.object_ngbrs2_scores = self.nn(features=self.object_ngbrs2, layers=[], out=500,
                                                     scope_name="nn_phi2_atten")
                 self.object_ngbrs2_weights = tf.nn.softmax(self.object_ngbrs2_scores, dim=0)
@@ -267,7 +267,7 @@ class Module(object):
             pred_forget_gate = self.nn(features=self.relation_all_features, layers=[], out=1,
                                        scope_name="nn_pred_forgate", last_activation=tf.nn.sigmoid)
             out_confidence_relation = pred_delta + pred_forget_gate * in_confidence_relation
-            
+
             ##
             # rho entity (entity prediction)
             # The input is entity features, entity neighbour features and the representation of the graph

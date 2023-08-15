@@ -16,14 +16,12 @@ matplotlib.pyplot.switch_backend('agg')
 import time
 
 def iou(box_a, box_b):
-    union_area = (max(box_a[2], box_b[2]) - min(box_a[0], box_b[0]) + 1) * (max(box_a[3], box_b[3]) - min(box_a[1], box_b[1]) + 1) 
+    union_area = (max(box_a[2], box_b[2]) - min(box_a[0], box_b[0]) + 1) * (max(box_a[3], box_b[3]) - min(box_a[1], box_b[1]) + 1)
     overlap_w = min(box_a[2], box_b[2]) - max(box_a[0], box_b[0]) + 1
     if overlap_w <= 0:
         return 0
     overlap_h = min(box_a[3], box_b[3]) - max(box_a[1], box_b[1]) + 1
-    if overlap_h <= 0:
-        return 0
-    return float(overlap_w * overlap_h) / union_area
+    return 0 if overlap_h <= 0 else float(overlap_w * overlap_h) / union_area
 
 def eval_image(entity, labels_relation, labels_entity, out_confidence_relation_val, out_confidence_entity_val, k=100):
     """
